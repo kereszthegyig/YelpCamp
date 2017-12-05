@@ -1,0 +1,104 @@
+<% include ../partials/header %>
+
+
+
+
+<h1>User profile</h1>
+
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+        <h1><%=profile.firstName%> <%=profile.lastName%></h1>
+        <div class="thumbnail">
+            <img src="<%=profile.avatar%>" alt="User's profile picture">
+        </div>
+        
+    </div>
+    
+    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <div class="well">
+            <% campgrounds.forEach(function(campground) { %>
+            <hr>
+            <div class="campground-post">
+                <div class="text-left">
+                     <h4 class="campground-name"><a href="/campgrounds/<%= campground._id %>"><%= campground.name %></a></h4>
+                </div>
+              
+                 <div class="campground-body">
+                     <div class="campground-avatar"><img class="img-responsive" src='<%= campground.image.path %>'></div>
+                     <div class="campground-text"><%=campground.description%></div>
+                 </div>
+                
+                 
+                         <form class="comment-form" action='/campgrounds/<%=campground._id %>/comments/' method="POST">
+                             <div class="input-group comment-btn-container">
+                                 <span class="input-group-btn comment-badge">
+                                     <% if(campground.comments.length > 0) {%>
+                                             
+                                                 <button class="btn btn-primary comment-badge" type="button">
+                                                      Comments <span class="badge"><%=campground.comments.length%></span>
+                                                 </button>
+                                            
+                                    <% } %>
+                                </span>
+                                 
+                                  <input type="text" class="form-control" name='comment[text]' aria-label="...">
+                                  <div class="input-group-btn">
+                                   <input type="submit" value="Send"<button class="btn btn-primary"> </button>>
+                                  </div>
+                            </div>
+                        </form>
+                        
+              
+             </div>
+            
+                 <div class="well display-well comment-well">
+                     
+                         <% campground.comments.forEach(function(comment){ %>
+                         <div class="media-list comment-hide comment-display">
+                             <div class="col-md-12 comments media">
+                                 <p class="avatar-name"><a href="/profile/<%=comment.author.id%>"><strong><%= comment.author.username %></strong></a></p>
+                                 <span class="pull-right timer"><%=moment(comment.createdAt).fromNow()%></span>
+                                 <div class="comment-body">
+                                      <div class="comment-avatar"><img class="img-responsive" src='<%= comment.author.avatar %>'></div>
+                                      <div class="comment-text"><%=comment.text%></div>
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <% }) %>
+                         <hr>
+                  </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+<script>
+// JQUERY
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous">
+</script>
+
+<script>
+// COMMENT BADGE
+    $(".input-group.comment-btn-container").on('click','.input-group-btn.comment-badge', function() {
+        $(this).parent().parent().parent().next('div.comment-well').toggle('slow')
+        
+    })
+</script>
+
+
+        
+
+
+        
+        
+
+
+
+
+
+
+
+<% include ../partials/footer %>

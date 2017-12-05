@@ -1,0 +1,63 @@
+
+<% include ../partials/header %>
+
+
+   <header class="jumbotron">
+      <div class="container">
+         <h1> Welcome to YelpCamp</h1>
+         <p>View our hand-picked campgrounds from all over the world</p>
+         <p>
+           <a class="btn btn-primary btn-lg" href="/campgrounds/new"> Add a New Campground</a>
+         </p>
+         <form action="/campgrounds" method="GET" class="form-inline" id="campground-search">
+            <div class="form-group">
+               <input type="text" name="search" placeholder="Campground search..." class="form-control">
+               <input type="submit" value="Search" class="btn btn-default">
+            </div>
+         </form>
+      </div>
+   </header>
+   
+   <!--<div class="row">-->
+   <!--   <div class="col-lg-12">-->
+   <!--      <h3>Our Most Popular CampGrounds!</h3>-->
+   <!--   </div>-->
+   <!--</div>-->
+
+
+   <div class="row text-center" style="display: flex; flex-wrap: wrap">
+      <div class="col-md-12">
+         <% if(noMatch) { %>
+         <h3><%=noMatch%></h3>
+         <% } %>
+      </div>
+      
+   </div>
+   
+   <div class="row text-center" id="campground-grid" style="display:flex; flex-wrap: wrap;">
+      <% campgrounds.forEach(function(curr) { %>
+         <div class="col-md-3 col-sm-6">
+            <div class="thumbnail">
+               <a href='/campgrounds/<%= curr.id%>'><img src="<%= curr.image.path %>"></a>
+             <div class="captions">
+               <h4><%= curr.name %></h4>
+            </div>
+            <p>
+               <a href='/campgrounds/<%= curr.id%>' class='btn btn-primary'>More Info</a>
+            </p>
+            </div>
+            
+         </div> 
+      <% }) %>
+   </div>
+
+
+
+
+
+
+
+
+<script></script>
+
+<% include ../partials/footer %>

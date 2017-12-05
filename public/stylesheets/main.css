@@ -1,0 +1,165 @@
+
+.thumbnail img {
+    background-size: cover;
+    min-width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.thumbnail {
+    padding: 0px;
+    margin-top: 30px;
+    margin-right: 20px;
+}
+
+.deleteForm {
+    display: inline;
+}
+
+#gobackButton {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    
+}
+.media-heading {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+#mediapicture {
+    max-width: 25%;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: 65px;
+    
+}
+
+#campground-description p {
+    padding: 0;
+    margin: 0;
+    text-align: justify;
+  
+   
+}
+
+#comment-well {
+    margin-top: 35px;
+}
+
+.comments {
+    position: relative;
+  
+    
+}
+ .timer {
+     position: absolute;
+     top: 3%;
+     right: 3%;
+ }
+
+/*SHOW PAGE - COMMENTS*/
+
+.comment-body {
+    max-width: 100%;
+    height: 100%;
+}
+
+.comment-avatar{
+    /*position: relative;*/
+    max-width: 15%;
+    margin-right: 20px;
+    float: left;
+  }
+
+.comment-text {
+    max-width: 95%;
+     text-align: justify;
+   
+     height: inherit;
+     margin-bottom: 20px;
+    
+}
+
+
+/*Profile PAGE - CAMPGROUNDS*/
+
+.campground-post {
+    
+    display: block;
+    height: 100%;
+   
+}
+.campground-name {
+    margin-top: 15px;
+}
+
+.avatar-name {
+    margin-bottom: 15px;
+}
+.campground-body {
+    overflow: hidden;
+    max-width: 100%;
+    height: 100%;
+   
+}
+
+.campground-avatar{
+    /*position: relative;*/
+    max-width: 25%;
+    margin: 10px 20px 10px 10px;
+    float: left;
+  
+  }
+
+.campground-text {
+    max-width: 95%;
+    margin: 10px;
+     text-align: justify;
+}
+
+.comment-well {
+    display: none;
+    overflow: hidden;
+    
+}
+.display-well{
+    
+}
+
+
+.comment-form {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+/* Google Maps */
+#map {
+    height: 400px;
+    width: 100%;
+    margin-top: 30px;
+}
+
+
+#icon-container {
+    position: relative
+}
+
+#image-icon {
+    position: absolute;
+    font-size: 1.5em;
+    right: 2%;
+    bottom: 3%;
+    color: white;
+    opacity: 0.5;
+    transition: opacity 0.3s linear;
+}
+#image-icon:hover {
+    opacity: 1;
+}
+
+.media-left img {
+    max-width: 3%;
+}

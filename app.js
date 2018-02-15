@@ -5,10 +5,10 @@ var express         = require("express"),
     flash           = require('connect-flash'),
     Campground      = require("./models/campground"),
     Comment         = require("./models/comment"),
-    seedDB          = require("./seeds"),
+    // seedDB          = require("./seeds"),
     passport        = require("passport"),
     LocalStrategy   = require("passport-local"),
-    passportLocalMongoose = require("passport-local-mongoose"),
+    //passportLocalMongoose = require("passport-local-mongoose"),
     User            = require("./models/user"),
     methodOverride  = require('method-override');
     
@@ -19,6 +19,7 @@ var commentRoutes       = require("./routes/comments"),
 require('dotenv').config();
     
 var url = process.env.MONGODB_URL || 'mongodb://localhost/yelp_camp';
+ mongoose.Promise = global.Promise;
 
 mongoose.connect(process.env.MONGODB_URL, {useMongoClient: true});  
 
@@ -38,12 +39,11 @@ app.use(require('express-session')({
     saveUninitialized: false
 }));
 
+require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+
 
 app.locals.moment= require("moment");
 

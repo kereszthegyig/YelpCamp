@@ -37,7 +37,12 @@
                       <li class="<%= typeof page !== 'undefined' && page === 'login' ? 'active' : '' %>"><a href="/login">Login</a></li>
                       <li class="<%= typeof page !== 'undefined' && page === 'register' ? 'active' : '' %>"><a href="/register">Sign Up</a></li>
                   <% } else { %>
-                      <li><a href="/profile/<%=currentUser._id%>">Signed In As <%= currentUser.username %></a></li>
+                      <li><a href="/profile/<%=currentUser._id%>">Signed In As 
+                      <% if (currentUser.facebook.username) { %>
+                      <%= currentUser.facebook.username %>
+                      <% } else { %>
+                      <%= currentUser.local.username %></a></li>
+                      <% } %>
                       <li><a href="/logout">Logout</a></li>
                   <% } %>
               </ul>

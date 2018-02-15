@@ -3,6 +3,7 @@ var router  = express.Router();
 var Campground = require("../models/campground");
 var middleware = require('../middleware') ;          //because of the index.js default name
 var geocoder = require('geocoder');
+require('dotenv').config();
 
 ///////////////////////////////////////
 // MULTER
@@ -26,9 +27,9 @@ var upload = multer({ storage: storage, fileFilter: imageFilter});
 //CLOUDINARY
 
 var cloudinary = require('cloudinary');
-cloudinary.config({ 
+cloudinary.config({
   cloud_name: process.env.CLOUD_NAME, 
-  api_key: process.env.CLOUD_KEY,
+  api_key: process.env.CLOUD_KEY, 
   api_secret: process.env.CLOUD_SECRET
 });
 
@@ -65,7 +66,8 @@ router.get('/', function(req, res) {
 ///////////////////////////////////////
 // CREATE - ADD NEW CAMPGROUND TO THE DB
 
-router.post('/',  middleware.isLoggedIn, upload.single('image'), function(req, res) {
+router.post('/', middleware.isLoggedIn, upload.single('image'), function(req, res) {
+    console.log(req.user);
     //GEOCODER
     geocoder.geocode(req.body.location, function (err, data) {              
         
@@ -76,12 +78,14 @@ router.post('/',  middleware.isLoggedIn, upload.single('image'), function(req, r
                      id: result.public_id
                  };
                  
+                 
                  var name = req.body.name;
                  var price = req.body.price;
                  var description = req.body.description;
+                 
                  var author = {
                     id: req.user._id,
-                    username: req.user.username
+                    username: req.user.local.username || req.user.facebook.username
                 };
                if(!data.results[0]) {
                     var lat = 90;

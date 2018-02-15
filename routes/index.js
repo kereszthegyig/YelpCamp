@@ -7,6 +7,8 @@ var async               = require("async");
 var nodemailer          = require("nodemailer");
 var crypto              = require('crypto');
 
+
+require('dotenv').config();
 ///////////////////////////////////////
 //MULTER
 
@@ -28,12 +30,12 @@ var upload = multer({ storage: storage, fileFilter: imageFilter});
 
 ///////////////////////////////////////
 //CLOUDINARY
-var cloudinary = require('cloudinary');
-cloudinary.config({ 
-  cloud_name: process.env.CLOUD_NAME, 
-  api_key: process.env.CLOUD_KEY, 
-  api_secret: process.env.CLOUD_SECRET
-});
+//var cloudinary = require('cloudinary');
+// cloudinary.config({
+//   cloud_name: "dcvshooib", 
+//   api_key: "885342146938272", 
+//   api_secret: "4iLgcQWhgrScQd0snrZseNi7mX4"
+// });
 
 
 ///////////////////////////////////////
@@ -47,7 +49,6 @@ router.get('/', function(req, res) {
    res.render('landing'); 
 });
 
-
 //==========================
 //  AUTHORIZATION ROUTES
 //==========================
@@ -59,29 +60,18 @@ router.get('/register', function(req,res) {
     res.render('register', {page: 'register'});
 });
 
-router.post('/register', upload.single('avatar'), function(req, res) {
-    cloudinary.uploader.upload(req.file.path, function(result) {
-         var newUser = new User({username: req.body.username, firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email, avatar: result.secure_url});
-         if(req.body.adminCode === process.env.ADMIN_CODE) {
-            newUser.isAdmin = true;
-         }
-            User.register(newUser, req.body.password, function(err, user) {
-                if(err) {
-                    console.log(err);
-                    return res.render("register", {error: err.message});
-                    
-                } else {
-                    passport.authenticate('local')(req, res, function () {
-                        req.flash('success', "Welcome to YelpCamp " + user.username);
-                        res.redirect('/campgrounds');
-                
-                    });
-                }
-    
-        });
-    });
+router.post('/register', 
+    passport.authenticate('local-signup', { 
+          failureRedirect : '/register', // redirect back to the signup page if there is an error
+          failureFlash : true // allow flash messages
+}), function(req,res) {
+    // Success
+    req.flash("success", "Welcome to YelpCamp " + req.user.local.username + "!");
+    res.redirect(`/profile/${req.user._id}/`);
 });
 
+   
+        
 
 ///////////////////////////////////////
 //LOGIN ROUTE
@@ -90,11 +80,31 @@ router.post('/register', upload.single('avatar'), function(req, res) {
      res.render('login',{page: 'login'});
  });
  
- router.post('/login', passport.authenticate('local',{
-         successRedirect: '/campgrounds',
-         failureRedirect: '/login'
-     }), function(req, res){
- });
+ router.post('/login', passport.authenticate('local-login',{
+        failureRedirect: "/login",
+        failureFlash: true,
+    }), function(req, res){
+        req.flash("success","Welcome " + req.user.local.username + "!");
+        res.redirect(`/profile/${req.user._id}`);
+    }
+);
+
+
+
+router.get('/auth/facebook',
+  passport.authenticate('facebook',{ scope : ['email', 'photos'] }));
+
+router.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login', failureFlash : true}),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    req.flash('success', 'Welcome to YelpCamp ' + req.user.facebook.username + '! ')
+    res.redirect('/campgrounds');
+   
+  });
+
+
+
 
 ///////////////////////////////////////
 // LOGOUT ROUTE
@@ -104,6 +114,21 @@ router.get('/logout', function(req, res) {
     req.flash("success", 'Logged you out!');
     res.redirect('/campgrounds');
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ///////////////////////////////////////
 // PASSWORD RESET ROUTES
@@ -127,13 +152,13 @@ router.post('/forget', function(req, res, next){
           },
           //examine, that is there a user of the given email and if the user is exist, set the token and the value of expire in the database and SAVE
         function(token, done) {
-          User.findOne({email: req.body.email}, function(err, foundUser) {
+          User.findOne({'local.email': req.body.email}, function(err, foundUser) {
              if(!foundUser) {
                  req.flash('error', 'No account with that email address exists.');
                  return res.redirect('/forget');
              } else {
-                 foundUser.resetPasswordToken = token;
-                 foundUser.resetPasswordExpires = Date.now() +  36000000; /// + 1 hour
+                 foundUser.local.resetPasswordToken = token;
+                 foundUser.local.resetPasswordExpires = Date.now() +  36000000; /// + 1 hour
                  foundUser.save(function(err) {
                      done(err, token, foundUser)
                  });
@@ -151,7 +176,7 @@ router.post('/forget', function(req, res, next){
             });
             var mailOptions = {
                 from: process.env.EMAIL_ADRESS,
-                to: foundUser.email,
+                to: foundUser.local.email,
                 subject: 'Password Reset',
                 text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
                       'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -160,7 +185,7 @@ router.post('/forget', function(req, res, next){
             };
             smtpTransport.sendMail(mailOptions, function(err){
                  console.log('mail sent');
-                 req.flash('success', 'An e-mail has been sent to ' + foundUser.email + ' with further instructions.');
+                 req.flash('success', 'An e-mail has been sent to ' + foundUser.local.email + ' with further instructions.');
                  done(err, done);
             });
         },
@@ -176,7 +201,7 @@ router.post('/forget', function(req, res, next){
 // SHOW the NEW PASSWORD PAGE - GET
 
 router.get('/reset/:token', function(req, res) {
-   User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, foundUser) {
+   User.findOne({ 'local.resetPasswordToken': req.params.token, 'local.resetPasswordExpires': { $gt: Date.now() }}, function(err, foundUser) {
         if(!foundUser) {
             req.flash('error', 'Password reset token is invalid or has expired.');
             return res.redirect('/forgot');
@@ -189,22 +214,21 @@ router.get('/reset/:token', function(req, res) {
 router.post('/reset/:token', function(req, res) {
     async.waterfall([
         function(done){
-          User.findOne({ resetPasswordToken:req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, foundUser) {
+          User.findOne({ 'local.resetPasswordToken':req.params.token, 'local.resetPasswordExpires': { $gt: Date.now() }}, function(err, foundUser) {
               if(!foundUser) {
                   req.flash('error', 'Password reset token is invalid or has expired.');
                   return res.redirect('back');
               } else {
                   if(req.body.password === req.body.passwordConf) {
-                      foundUser.setPassword(req.body.password, function(err){
-                            foundUser.resetPasswordToken = undefined;
-                            foundUser.resetPasswordExpires = undefined;
-                            
+                      foundUser.local.password = foundUser.generateHash(req.body.password)
+                      foundUser.local.resetPasswordToken = undefined;
+                      foundUser.local.resetPasswordExpires = undefined;
+                      
                             foundUser.save(function(err) {
                                 req.logIn(foundUser, function(err) {
                                     done(err, foundUser);
                                 });
                             });
-                      });
                   } else {
                       req.flash('error', 'Passwords do not match');
                       return res.redirect('back');
@@ -224,10 +248,10 @@ router.post('/reset/:token', function(req, res) {
           
           var mailOptions = {
               from: process.env.EMAIL_ADRESS,
-              to: foundUser.email,
+              to: foundUser.local.email,
               subject: 'Your password has been changed',
               text:  'Hello,\n\n' +
-                     'This is a confirmation that the password for your account ' + foundUser.email + ' has just been changed.\n'
+                     'This is a confirmation that the password for your account ' + foundUser.local.email + ' has just been changed.\n'
           };
           
           smtpTransport.sendMail(mailOptions, function(err) {

@@ -7,7 +7,12 @@
 
 <div class="row">
     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-        <h1><%=profile.firstName%> <%=profile.lastName%></h1>
+        <% if(profile.facebook.username) { %>
+            <h1> <%=profile.facebook.username%> </h1>
+        <% } else { %>
+            <h1> <%=profile.local.username%> </h1> 
+        <% } %>
+        
         <div class="thumbnail">
             <img src="<%=profile.avatar%>" alt="User's profile picture">
         </div>
@@ -73,12 +78,12 @@
     </div>
 </div>
 
-<script>
-// JQUERY
-  src="https://code.jquery.com/jquery-3.1.1.min.js"
-  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-  crossorigin="anonymous">
-</script>
+
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
 
 <script>
 // COMMENT BADGE

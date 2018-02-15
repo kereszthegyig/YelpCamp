@@ -34,8 +34,8 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
                     console.log(err);
                 } else {
                     comment.author.id = req.user._id;
-                    comment.author.username = req.user.username;
-                    comment.author.avatar = req.user.avatar;
+                    comment.author.username = req.user.facebook.username || req.user.local.username;
+                    // comment.author.avatar = req.user.avatar;
                     comment.save();
                     foundCampGround.comments.push(comment);
                     foundCampGround.save();
